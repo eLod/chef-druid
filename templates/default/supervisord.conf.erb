@@ -1,0 +1,18 @@
+[program:<%= @service_name %>]
+user=<%= @user %>
+group=<%= @group %>
+autostart=true
+autorestart=true
+stopsignal=KILL
+stopasgroup=true
+killasgroup=true
+command=java
+  -server
+  -Duser.timezone=<%= @timezone %>
+  -Dfile.encoding=<%= @encoding %>
+  <%= @java_opts %>
+  -cp <%= @config_dir %>:<%= @extra_classpath %><%= @install_dir %>/current/lib/*
+  io.druid.cli.Main server <%= @node_type %>
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/<%= @service_name %>.log
+stderr_logfile=NONE

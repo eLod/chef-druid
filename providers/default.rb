@@ -83,12 +83,16 @@ action :install do
     group node[:druid][:group]
   end
 
-  # Startup script
+  package "supervisor" do
+    action :install
+  end
+
   service_name = "druid-#{node_type}"
   extra_classpath = node[:druid][node_type]["druid.extra_classpath"] || node[:druid]["druid.extra_classpath"]
-  template "/etc/init/#{service_name}.conf" do
-    source "upstart.conf.erb"
+  template "/etc/supervisor/conf.d/#{service_name}.conf" do
+    source "supervisord.conf.erb"
     variables({
+                  :service_name => service_name,
                   :node_type => node_type,
                   :user => node[:druid][:user],
                   :group => node[:druid][:group],
@@ -103,9 +107,8 @@ action :install do
               })
   end
 
-  service "druid-#{node_type}" do
-    provider Chef::Provider::Service::Upstart
+  service "supervisor" do
     supports :restart => true, :start => true, :stop => true
-    action [:enable, :restart]
+    action :restart
   end
 end
